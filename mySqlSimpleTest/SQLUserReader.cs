@@ -11,18 +11,18 @@ namespace mySqlSimpleTest
 {
     public class SQLUserReader
     {
+        string myConnectionString = "server=127.0.0.1;uid=root;pwd=vertrigo;database=myvknetwork;"; /// строка соединения с БД
         public BindingList<User> ReadUsers()
         {
             BindingList<User> result = new BindingList<User>();
 
-            string myConnectionString = "server=127.0.0.1;uid=root;pwd=vertrigo;database=myvknetwork;"; /// строка соединения с БД
             try
             {
                 using (MySqlConnection conn = new MySqlConnection(myConnectionString))
                 {
                     conn.Open();
 
-                    const string query = "SELECT Login AS Логин, Name, Surname, Email, Password, Birthday FROM users;";
+                    const string query = "SELECT Login, Name, Surname, Email, Password, Birthday FROM users;";
                     MySqlCommand command = new MySqlCommand(query, conn); /// объект команды
                     using (MySqlDataReader reader = command.ExecuteReader()) /// запуск исполнения команды на сервере
                     {
@@ -49,6 +49,26 @@ namespace mySqlSimpleTest
             }
 
             return result;
+        }
+
+        public void DeleteUser(string login)
+        {
+            try
+            {
+                using (MySqlConnection conn = new MySqlConnection(myConnectionString))
+                {
+                    conn.Open();
+
+                    string query = "DELETE FROM users WHERE login = @login;";
+                    MySqlCommand command = new MySqlCommand(query, conn);
+                    command.Parameters.AddWithValue("@login", login);
+                    command.ExecuteNonQuery();
+                }
+            }
+            catch (MySqlException ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
         }
     }
 }
